@@ -4,6 +4,7 @@ import { MethodsService } from '../services/methods.service';
 import { MessageService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
 import { saveAs } from 'file-saver';
+import { IResult } from '../models/result';
 
 @Component({
   selector: 'app-methods',
@@ -14,9 +15,15 @@ export class MethodsComponent implements OnInit {
   Euler: string = 'euler_method.csx';
   RungeKutta: string = 'rk_method.csx';
 
-  methods: IMethod[] | undefined;
+  methods: IMethod[] = [
+    { name: 'Euler', id: 1 },
+    { name: 'RungeKutta', id: 2 },
+    { name: 'Task 1', id: 3}
+  ];
+
   file: any | null = null;
-  result: number | null = null;
+  result: any | null = null;
+  aiGrade: string | null = null;
 
   selectedMethod: IMethod | null = null;
 
@@ -24,12 +31,7 @@ export class MethodsComponent implements OnInit {
 
   constructor(private methodsService: MethodsService, private messageService: MessageService) { }
 
-  ngOnInit() {
-    this.methods = [
-      { name: 'Euler', id: 1 },
-      { name: 'Runge-Kutta', id: 2 },
-    ];
-  }
+  ngOnInit() { }
 
   downloadTemplate() {
     let fileName = '';
@@ -62,15 +64,21 @@ export class MethodsComponent implements OnInit {
 
     this.methodsService.postFile(formData)
       .subscribe({
-        next: (response: number) => {
+        next: (response: IResult) => {
           this.messageService.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
-          this.result = response;
+
+          if (response.value.relativeErrorPercent)
+            this.result = response.value.relativeErrorPercent;
+          else this.result = response.value;
+
+          this.aiGrade = response.aiReview;
         }
       });
   }
 
   onChange(event: any) {
     this.result = null;
+    this.aiGrade = null;
     this.file = null;
     this.fileUploadControl.clear();
   }

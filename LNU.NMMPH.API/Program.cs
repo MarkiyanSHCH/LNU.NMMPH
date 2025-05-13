@@ -11,6 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IMethodsService, MethodsService>();
 builder.Services.AddScoped<IEulerMethod, EulerMethod>();
 builder.Services.AddScoped<IRungeKuttaMethod, RungeKuttaMethod>();
+builder.Services.AddScoped<IPoissonMethod, PoissonMethod>();
+builder.Services.AddScoped<IGroqAiReviewService, GroqAiReviewService>();
 
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>

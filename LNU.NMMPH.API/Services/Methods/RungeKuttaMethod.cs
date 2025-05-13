@@ -2,17 +2,23 @@
 
 using LNU.NMMPH.API.Interface.Methods;
 using LNU.NMMPH.API.Models.Parameters;
+using LNU.NMMPH.API.Models;
+using LNU.NMMPH.API.Interface;
 
 namespace LNU.NMMPH.API.Services.Methods
 {
     public class RungeKuttaMethod : IRungeKuttaMethod
     {
         private readonly RungeKuttaParameters _parameters;
+        private readonly IGroqAiReviewService _aiReviewService;
 
-        public RungeKuttaMethod()
-            => _parameters = new RungeKuttaParameters();
+        public RungeKuttaMethod(IGroqAiReviewService aiReviewService)
+        {
+            _parameters = new RungeKuttaParameters();
+            _aiReviewService = aiReviewService;
+        }
 
-        public async Task<double> ExecuteStudent(string code)
+        public async Task<Result<double>> ExecuteStudent(string code)
         {
             double[] rungeKuttaResult = await CSharpScript.EvaluateAsync<double[]>(code, globals: _parameters);
 
@@ -20,7 +26,9 @@ namespace LNU.NMMPH.API.Services.Methods
 
             double rungeKuttaError = CalculateError(rungeKuttaResult, rungeKuttaExact);
 
-            return rungeKuttaError;
+            string reviewedCode = await _aiReviewService.ReviewCodeAsync(code, "Runge Kutta Method");
+
+            return new Result<double> { Value = rungeKuttaError, AiReview = reviewedCode };
         }
 
         private double[] CurrectMethod()

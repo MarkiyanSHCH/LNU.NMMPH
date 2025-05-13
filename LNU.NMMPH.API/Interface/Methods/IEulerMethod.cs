@@ -1,8 +1,9 @@
-﻿
+﻿using LNU.NMMPH.API.Models;
+
 namespace LNU.NMMPH.API.Interface.Methods
 {
     public interface IEulerMethod
     {
-        Task<double> ExecuteStudent(string eulerCode);
+        Task<Result<double>> ExecuteStudent(string code);
     }
 }

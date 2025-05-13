@@ -2,17 +2,20 @@
 
 using LNU.NMMPH.API.Interface.Methods;
 using LNU.NMMPH.API.Models.Parameters;
+using LNU.NMMPH.API.Interface;
+using LNU.NMMPH.API.Models;
 
 namespace LNU.NMMPH.API.Services.Methods
 {
     public class EulerMethod : IEulerMethod
     {
         private readonly EulerMethodParameters _parameters;
+        private readonly IGroqAiReviewService _aiReviewService;
 
-        public EulerMethod()
-            => _parameters = new EulerMethodParameters();
+        public EulerMethod(IGroqAiReviewService aiReviewService)
+            => (_parameters, _aiReviewService) = (new EulerMethodParameters(), aiReviewService);
 
-        public async Task<double> ExecuteStudent(string code)
+        public async Task<Result<double>> ExecuteStudent(string code)
         {
             double[] eulerResult = await CSharpScript.EvaluateAsync<double[]>(code, globals: _parameters);
 
@@ -20,7 +23,9 @@ namespace LNU.NMMPH.API.Services.Methods
 
             double eulerError = CalculateError(eulerResult, eulerExact);
 
-            return eulerError;
+            string reviewedCode = await _aiReviewService.ReviewCodeAsync(code, "Euler Method");
+
+            return new Result<double> { Value = eulerError, AiReview = reviewedCode };
         }
 
         private double[] CorrectMethod()

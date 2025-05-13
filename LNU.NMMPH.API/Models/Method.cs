@@ -4,5 +4,6 @@
     {
         EulerMethod = 1,
         RungeKuttaMethod,
+        PoissonMethod,
     }
 }

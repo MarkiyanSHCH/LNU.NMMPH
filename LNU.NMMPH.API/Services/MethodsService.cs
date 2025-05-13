@@ -9,14 +9,16 @@ namespace LNU.NMMPH.API.Services
     {
         private readonly IEulerMethod _eulerMethod;
         private readonly IRungeKuttaMethod _rungeKuttaMethod;
+        private readonly IPoissonMethod _poissonMethod;
 
-        public MethodsService(IEulerMethod eulerMethod, IRungeKuttaMethod rungeKuttaMethod)
+        public MethodsService(IEulerMethod eulerMethod, IRungeKuttaMethod rungeKuttaMethod, IPoissonMethod poissonMethod)
         {
             _eulerMethod = eulerMethod;
             _rungeKuttaMethod = rungeKuttaMethod;
+            _poissonMethod = poissonMethod;
         }
 
-        public async Task<double> Execute(Method method, IFormFile file)
+        public async Task<object> Execute(Method method, IFormFile file)
         {
             string fileString = await ConvertIFormFileToString(file);
 
@@ -24,6 +26,7 @@ namespace LNU.NMMPH.API.Services
             {
                 Method.EulerMethod => await _eulerMethod.ExecuteStudent(fileString),
                 Method.RungeKuttaMethod => await _rungeKuttaMethod.ExecuteStudent(fileString),
+                Method.PoissonMethod => await _poissonMethod.ExecuteStudent(fileString),
                 _ => throw new NotImplementedException(),
             };
         }

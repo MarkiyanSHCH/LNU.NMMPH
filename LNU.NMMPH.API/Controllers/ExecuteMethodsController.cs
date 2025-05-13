@@ -26,7 +26,7 @@ namespace LNU.NMMPH.API.Controllers
             if (!request.Method.HasValue)
                 return BadRequest("No method specified.");
 
-            double result = await _methodsService.Execute(request.Method.Value, request.File);
+            object result = await _methodsService.Execute(request.Method.Value, request.File);
 
             return Ok(result);
         }
